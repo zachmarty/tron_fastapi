@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 
 class AddressBase(BaseModel):
     address: str
-    bandwith: int
+    bandwidth: int
     energy: int
     trx: float
 

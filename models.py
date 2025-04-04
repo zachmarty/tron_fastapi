@@ -22,10 +22,9 @@ class Base(DeclarativeBase):
 
 class Address(Base):
     __tablename__ = "addresses"
-
     id: Mapped[int] = mapped_column(primary_key=True)
     address: Mapped[str] = mapped_column(String)
-    bandwith: Mapped[int] = mapped_column(Integer)
+    bandwidth: Mapped[int] = mapped_column(Integer)
     energy: Mapped[int] = mapped_column(Integer)
     trx: Mapped[float] = mapped_column(Float)
 
@@ -33,14 +32,16 @@ class Address(Base):
         return {
             "id": self.id,
             "address": self.address,
-            "bandwith": self.bandwith,
+            "bandwidth": self.bandwidth,
             "energy": self.energy,
             "trx": self.trx,
         }
 
+
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
 
 async def drop_tables():
     async with engine.begin() as conn:
