@@ -16,7 +16,7 @@ class AddressORM:
     @classmethod
     async def write_address(cls, data: AddressBase):
         async with new_session() as session:
-            new_item = Address(**data)
+            new_item = Address(**data.model_dump())
             session.add(new_item)
             await session.flush()
             await session.commit()

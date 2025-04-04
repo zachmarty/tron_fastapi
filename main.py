@@ -14,17 +14,20 @@ async def lifespan(app: FastAPI):
     yield
 
 
-tron = AsyncTron()
+tron = AsyncTron(network='nile')
 app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/{address}")
 async def get_data_and_save(address: str):
     try:
+        account = await tron.get_account(address)
+
+        if not account:
+            raise HTTPException(400, 'Account not found')
         bandwith = await tron.get_bandwidth(address)
-        energy = await tron.get_estimated_energy(address)
+        energy = account.get('energy_remaining', 0)
         trx = await tron.get_account_balance(address)
-        AddressORM.write_address(address)
         new_address = AddressBase(
             address=address, bandwith=bandwith, energy=energy, trx=trx
         )
