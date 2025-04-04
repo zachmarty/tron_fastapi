@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from httpx import ASGITransport, AsyncClient
 import pytest
@@ -5,36 +6,34 @@ import pytest_asyncio
 from main import app
 import os
 from dotenv import load_dotenv
-from models import create_tables, drop_tables
+from models import create_tables, drop_tables, new_session
 from orm import AddressORM
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 TEST_ADDRESS = os.getenv("TEST_ADDRESS")
 
+@pytest_asyncio.fixture(scope="session")
+def event_loop():
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
-@pytest.fixture(scope="session")
-async def prepare_db():
-    await create_tables()
-    yield
-    await drop_tables()
 
 @pytest_asyncio.fixture(scope="session")
 async def client():
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://localhost"
+        transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
         yield client
 
-
-# @pytest.mark.asyncio
-# async def test_get_address_data(client, prepare_db):
-#     response = await client.get(f"/{TEST_ADDRESS}")
-#     assert response.status_code == 200
+@pytest.mark.asyncio
+async def test_get_address_data(client):
+    response = await client.get(f"/{TEST_ADDRESS}")
+    assert response.status_code == 200
 
 @pytest.mark.asyncio
-async def test_get_data_and_save(client, prepare_db):
+async def test_get_data_and_save(client):
     response = await client.post(f"/{TEST_ADDRESS}")
-    print(response.status_code, response.json())
     assert response.status_code == 200
     data = response.json()
     assert data["address"] == TEST_ADDRESS

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from pathlib import Path
 from sqlalchemy import Float, Integer, String
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 import os
 
